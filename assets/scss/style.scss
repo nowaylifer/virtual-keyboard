@@ -1,2 +1,73 @@
 @forward 'reset';
 
+:root {
+  --bg-color: #f5f0f0;
+  --text-color: #26243d;
+  --keyboard-frame-color: #dfd9d9;
+  --key-color: #efefee;
+  --key-special-color: #e3e3e1;
+  --gap-between-keys: 3px;
+  --key-pressed-color: #42403e;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Mulish, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.keyboard {
+  padding: 35px;
+  background-color: var(--keyboard-frame-color);
+  border-radius: 16px;
+}
+
+.keyboard__keys-container {
+  width: 970px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-between-keys);
+}
+
+.keyboard__row {
+  display: flex;
+  gap: var(--gap-between-keys);
+}
+
+.key {
+  width: 58px;
+  height: 58px;
+  font-family: Mulish, sans-serif;
+  background-color: var(--key-color);
+
+  transition: background-color 0.3s, color 0.3s;
+
+  &:hover {
+    color: var(--key-color);
+    background-color: #949390;
+  }
+}
+
+.key--long {
+  flex-grow: 1;
+}
+
+.key--special {
+  background-color: var(--key-special-color);
+}
+
+.key--caps-lock {
+  max-width: 101px;
+}
+
+.key--right-shift {
+  max-width: 116px;
+}
+
+.key--spacebar {
+  flex-grow: 1;
+}
