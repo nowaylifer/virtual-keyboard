@@ -15,6 +15,9 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  gap: 20px;
+
   font-family: Mulish, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -70,4 +73,24 @@ body {
 
 .key--spacebar {
   flex-grow: 1;
+}
+
+.textarea {
+  width: 1000px;
+  height: 250px;
+  background-color: transparent;
+}
+
+@keyframes press-button {
+  from {
+    transform: none;
+  }
+  to {
+    background-color: var(--key-pressed-color);
+    transform: matrix(0.95, 0, 0, 0.95, 0, 0);
+  }
+}
+
+.pressed {
+  animation: press-button 0.3s;
 }
