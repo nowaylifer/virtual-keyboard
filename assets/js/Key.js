@@ -1,12 +1,13 @@
 export default class Key {
   constructor(keyCode, keyData) {
     this.keyCode = keyCode;
+    this.activeKey = `${keyData.keyString.eng?.[0] ?? keyData.keyString}`;
     this.element = this.createElement(keyData);
   }
 
   createElement(keyData) {
     const keyEl = document.createElement('button');
-    keyEl.textContent = `${keyData.keyString.eng?.[0] ?? keyData.keyString}`;
+    keyEl.textContent = this.activeKey;
     keyEl.className = 'key';
 
     if (keyData.options?.includes('special')) {
@@ -18,10 +19,15 @@ export default class Key {
       keyEl.classList.add('key--long');
     }
 
-    keyEl.onmousedown = () => keyEl.classList.add('pressed');
-    keyEl.onmouseup = () => keyEl.classList.remove('pressed');
+    if (this.keyCode === 'CapsLock') {
+      keyEl.classList.add('key--caps-lock');
+    }
 
-    keyEl.objKey = this;
+    if (this.keyCode === 'ShiftRight') {
+      keyEl.classList.add('key--right-shift');
+    }
+
+    keyEl.obj = this;
 
     return keyEl;
   }

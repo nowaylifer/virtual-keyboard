@@ -477,11 +477,16 @@ body {
   height: 58px;
   font-family: Mulish, sans-serif;
   background-color: var(--key-color);
-  transition: background-color 0.3s, color 0.3s;
+  transition: background-color 0.2s, color 0.2s;
 }
 .key:hover {
   color: var(--key-color);
   background-color: #949390;
+}
+.key:active, .key.pressed {
+  color: var(--key-color);
+  background-color: var(--key-pressed-color);
+  transform: matrix(0.95, 0, 0, 0.95, 0, 0);
 }
 
 .key--long {
@@ -500,25 +505,9 @@ body {
   max-width: 116px;
 }
 
-.key--spacebar {
-  flex-grow: 1;
-}
-
 .textarea {
+  font-size: 20px;
   width: 1000px;
   height: 250px;
   background-color: transparent;
-}
-
-@keyframes press-button {
-  from {
-    transform: none;
-  }
-  to {
-    background-color: var(--key-pressed-color);
-    transform: matrix(0.95, 0, 0, 0.95, 0, 0);
-  }
-}
-.pressed {
-  animation: press-button 0.3s;
 }/*# sourceMappingURL=style.css.map */
