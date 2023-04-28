@@ -58,8 +58,13 @@ export default class Keyboard {
     this.textArea = element;
   }
 
-  writeToTextArea(keyString) {
-    this.textArea.value += keyString;
+  writeToTextArea(string) {
+    this.textArea.setRangeText(
+      string,
+      this.textArea.selectionStart,
+      this.textArea.selectionEnd,
+      'end',
+    );
   }
 
   toggleShiftLayout() {
@@ -71,7 +76,11 @@ export default class Keyboard {
         return;
       }
 
-      if (this.#isCapsLockPressed && !this.#symbols.test(key.keyString[this.#currentLanguage][1])) {
+      // skip uppercase letters when capslock is pressed
+      if (
+        this.#isCapsLockPressed
+        && !this.#symbols.test(key.keyString[this.#currentLanguage][1])
+      ) {
         return;
       }
 
@@ -140,7 +149,17 @@ export default class Keyboard {
 
     if (!wasPressedKey) return;
 
+    this.textArea.focus();
+
     wasPressedKey.element.classList.remove('pressed');
+
+    if (
+      (wasPressedKey.keyCode.includes('Alt') && e.ctrlKey)
+      || (wasPressedKey.keyCode.includes('Control') && e.altKey)
+    ) {
+      this.#changeLanguageLayout();
+      return;
+    }
 
     if (wasPressedKey.keyCode.includes('Shift')) {
       this.toggleShiftLayout();
@@ -165,13 +184,7 @@ export default class Keyboard {
 
     if (!pressedKey) return;
 
-    if (
-      (pressedKey.keyCode.includes('Alt') && e.ctrlKey)
-      || (pressedKey.keyCode.includes('Control') && e.altKey)
-    ) {
-      this.#changeLanguageLayout();
-      return;
-    }
+    this.textArea.focus();
 
     // return if ctrl or alt key was pressed along with any other key
     if (e.ctrlKey || e.altKey) return;
