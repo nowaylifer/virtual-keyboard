@@ -7,6 +7,10 @@ const keyboard = new Keyboard(keysLayout);
 keyboard.connectInputField(textAreaEl);
 document.body.append(keyboard.element);
 
+textAreaEl.addEventListener('blur', () => {
+  textAreaEl.focus();
+});
+
 document.addEventListener('keydown', keyboard.handleInputDown.bind(keyboard));
 document.addEventListener('keyup', keyboard.handleInputUp.bind(keyboard));
 document.addEventListener('mouseup', keyboard.handleInputUp.bind(keyboard));

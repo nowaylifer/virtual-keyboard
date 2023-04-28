@@ -164,8 +164,6 @@ export default class Keyboard {
 
     if (!wasPressedKey) return;
 
-    this.inputField.focus();
-
     wasPressedKey.element.classList.remove('pressed');
 
     if (wasPressedKey.keyCode.includes('Shift')) {
@@ -191,8 +189,6 @@ export default class Keyboard {
 
     if (!pressedKey) return;
 
-    this.inputField.focus();
-
     const { keyCode } = pressedKey;
 
     // check for Ctrl + Alt
@@ -215,6 +211,10 @@ export default class Keyboard {
       this.toggleCapsLock();
     } else if (keyCode === 'Backspace' || keyCode === 'Delete') {
       this.#deleteText(keyCode);
+    } else if (keyCode === 'Enter') {
+      this.#writeText('\n');
+    } else if (keyCode === 'Tab') {
+      this.#writeText('\t');
     }
   }
 }
