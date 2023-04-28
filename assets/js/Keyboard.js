@@ -14,8 +14,6 @@ export default class Keyboard {
 
   #isCapsLockPressed = false;
 
-  #symbols = /[-._!"`'#%&,:;<>=@{}~$()*+/\\?[\]^№|]/;
-
   // create Key obj for each property in keysMap
   static #initKeys(keysMap) {
     const keysMapExtended = keysMap;
@@ -50,19 +48,19 @@ export default class Keyboard {
 
     keyboardEl.append(keysContainerEl);
 
-    keyboardEl.addEventListener('mousedown', (e) => this.handleInput(e));
+    keyboardEl.addEventListener('mousedown', (e) => this.handleInputDown(e));
     return keyboardEl;
   }
 
-  connectTextArea(element) {
-    this.textArea = element;
+  connectInputField(element) {
+    this.inputField = element;
   }
 
-  writeToTextArea(string) {
-    this.textArea.setRangeText(
+  #writeText(string) {
+    this.inputField.setRangeText(
       string,
-      this.textArea.selectionStart,
-      this.textArea.selectionEnd,
+      this.inputField.selectionStart,
+      this.inputField.selectionEnd,
       'end',
     );
   }
@@ -76,16 +74,17 @@ export default class Keyboard {
         return;
       }
 
+      const [primaryKey, alternativeKey] = key.keyString[this.#currentLanguage];
+
       // skip uppercase letters when capslock is pressed
       if (
         this.#isCapsLockPressed
-        && !this.#symbols.test(key.keyString[this.#currentLanguage][1])
+        && primaryKey.toUpperCase() === alternativeKey
       ) {
         return;
       }
 
-      const [primaryKeyString, alternativeKeyString] = key.keyString[this.#currentLanguage];
-      keyObj.activeKey = this.#isShiftPressed ? alternativeKeyString : primaryKeyString;
+      keyObj.activeKey = this.#isShiftPressed ? alternativeKey : primaryKey;
       keyObj.element.textContent = keyObj.activeKey;
     });
   }
@@ -95,22 +94,22 @@ export default class Keyboard {
 
     Object.values(this.keysMap).forEach((key) => {
       const { keyObj } = key;
-
-      if (
-        keyObj.isSpecial
-        || typeof key.keyString === 'string'
-        || this.#symbols.test(key.keyString[this.#currentLanguage][1])
-      ) {
+      if (keyObj.isSpecial || typeof key.keyString === 'string') {
         return;
       }
 
-      const [lowerCase, upperCase] = key.keyString[this.#currentLanguage];
-      keyObj.activeKey = this.#isCapsLockPressed ? upperCase : lowerCase;
+      const [primaryKey, alternativeKey] = key.keyString[this.#currentLanguage];
+
+      if (primaryKey.toUpperCase() !== alternativeKey) {
+        return;
+      }
+
+      keyObj.activeKey = this.#isCapsLockPressed ? alternativeKey : primaryKey;
       keyObj.element.textContent = keyObj.activeKey;
     });
   }
 
-  #changeLanguageLayout() {
+  changeLanguageLayout() {
     const langIndex = this.languages.indexOf(this.#currentLanguage);
     this.#currentLanguage = this.languages[langIndex + 1] ?? this.languages[0];
 
@@ -123,17 +122,17 @@ export default class Keyboard {
 
       const [primaryKey, alternativeKey] = key.keyString[this.#currentLanguage];
 
-      if (this.#symbols.test(alternativeKey)) {
-        keyObj.activeKey = this.#isShiftPressed ? alternativeKey : primaryKey;
-      } else {
+      if (primaryKey.toUpperCase() === alternativeKey) {
         keyObj.activeKey = this.#isCapsLockPressed ? alternativeKey : primaryKey;
+      } else {
+        keyObj.activeKey = this.#isShiftPressed ? alternativeKey : primaryKey;
       }
 
       keyObj.element.textContent = keyObj.activeKey;
     });
   }
 
-  handleKeyUp(e) {
+  handleInputUp(e) {
     let wasPressedKey;
 
     switch (e.type) {
@@ -149,24 +148,16 @@ export default class Keyboard {
 
     if (!wasPressedKey) return;
 
-    this.textArea.focus();
+    this.inputField.focus();
 
     wasPressedKey.element.classList.remove('pressed');
-
-    if (
-      (wasPressedKey.keyCode.includes('Alt') && e.ctrlKey)
-      || (wasPressedKey.keyCode.includes('Control') && e.altKey)
-    ) {
-      this.#changeLanguageLayout();
-      return;
-    }
 
     if (wasPressedKey.keyCode.includes('Shift')) {
       this.toggleShiftLayout();
     }
   }
 
-  handleInput(e) {
+  handleInputDown(e) {
     let pressedKey;
 
     switch (e.type) {
@@ -184,16 +175,26 @@ export default class Keyboard {
 
     if (!pressedKey) return;
 
-    this.textArea.focus();
+    this.inputField.focus();
+
+    // check for Ctrl + Alt
+    if (
+      ((pressedKey.keyCode.includes('Alt') && e.ctrlKey)
+      || (pressedKey.keyCode.includes('Control') && e.altKey))
+      && !e.repeat
+    ) {
+      this.changeLanguageLayout();
+      return;
+    }
 
     // return if ctrl or alt key was pressed along with any other key
     if (e.ctrlKey || e.altKey) return;
 
     if (!pressedKey.isSpecial) {
-      this.writeToTextArea(pressedKey.activeKey);
-    } else if (pressedKey.keyCode.includes('Shift') && !this.#isShiftPressed) {
+      this.#writeText(pressedKey.activeKey);
+    } else if (pressedKey.keyCode.includes('Shift') && !e.repeat) {
       this.toggleShiftLayout();
-    } else if (pressedKey.keyCode === 'CapsLock') {
+    } else if (pressedKey.keyCode === 'CapsLock' && !e.repeat) {
       this.toggleCapsLock();
     }
   }
