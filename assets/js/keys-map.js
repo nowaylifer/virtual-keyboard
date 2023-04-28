@@ -27,7 +27,7 @@ export default {
   KeyP: { keyString: { eng: ['p', 'P'], ru: ['з', 'З'] } },
   BracketLeft: { keyString: { eng: ['[', '{'], ru: ['х', 'Х'] } },
   BracketRight: { keyString: { eng: [']', '}'], ru: ['ъ', 'Ъ'] } },
-  Backslash: { keyString: { eng: ['\\', '|'], ru: ['\\', '/'] }, options: ['special', 'long'] },
+  Backslash: { keyString: { eng: ['\\', '|'], ru: ['\\', '/'] }, options: ['long'] },
   Home: { keyString: 'Home', options: ['special'] },
   CapsLock: { keyString: 'CapsLock', options: ['special', 'long'] },
   KeyA: { keyString: { eng: ['a', 'A'], ru: ['ф', 'Ф'] } },

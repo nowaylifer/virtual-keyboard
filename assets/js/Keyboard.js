@@ -9,6 +9,10 @@ export default class Keyboard {
 
   #isShiftPressed = false;
 
+  #isCapsLockPressed = false;
+
+  #symbols = /[-._!"`'#%&,:;<>=@{}~$()*+/\\?[\]^|]/;
+
   // create Key obj for each property in keysMap
   static #initKeys(keysMap) {
     const keysMapExtended = keysMap;
@@ -60,9 +64,36 @@ export default class Keyboard {
 
     Object.values(this.keysMap).forEach((key) => {
       const { keyObj } = key;
-      if (keyObj.isSpecial || typeof key.keyString === 'string') return;
+      if (keyObj.isSpecial || typeof key.keyString === 'string') {
+        return;
+      }
+
+      if (this.#isCapsLockPressed && !this.#symbols.test(key.keyString.eng[1])) {
+        return;
+      }
+
       const [primaryKeyString, alternativeKeyString] = key.keyString.eng;
       keyObj.activeKey = this.#isShiftPressed ? alternativeKeyString : primaryKeyString;
+      keyObj.element.textContent = keyObj.activeKey;
+    });
+  }
+
+  toggleCapsLock() {
+    this.#isCapsLockPressed = !this.#isCapsLockPressed;
+
+    Object.values(this.keysMap).forEach((key) => {
+      const { keyObj } = key;
+
+      if (
+        keyObj.isSpecial
+        || typeof key.keyString === 'string'
+        || this.#symbols.test(key.keyString.eng[1])
+      ) {
+        return;
+      }
+
+      const [lowerCase, upperCase] = key.keyString.eng;
+      keyObj.activeKey = this.#isCapsLockPressed ? upperCase : lowerCase;
       keyObj.element.textContent = keyObj.activeKey;
     });
   }
@@ -81,6 +112,8 @@ export default class Keyboard {
       this.writeToTextArea(pressedKey.activeKey);
     } else if (pressedKey.keyCode.includes('Shift') && !this.#isShiftPressed) {
       this.toggleShiftLayout();
+    } else if (pressedKey.keyCode === 'CapsLock') {
+      this.toggleCapsLock();
     }
   }
 
