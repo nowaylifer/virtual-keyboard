@@ -50,7 +50,7 @@ export default class Keyboard {
 
     keyboardEl.append(keysContainerEl);
 
-    keyboardEl.addEventListener('click', (e) => this.handleMouseDown(e));
+    keyboardEl.addEventListener('mousedown', (e) => this.handleInput(e));
     return keyboardEl;
   }
 
@@ -124,21 +124,56 @@ export default class Keyboard {
     });
   }
 
-  handleKeyDown(e) {
-    e.preventDefault();
+  handleKeyUp(e) {
+    let wasPressedKey;
 
-    const pressedKey = this.keysMap[e.code]?.keyObj;
+    switch (e.type) {
+      case 'keyup':
+        wasPressedKey = this.keysMap[e.code]?.keyObj;
+        break;
+      case 'mouseup':
+        wasPressedKey = e.target.closest('.key')?.obj;
+        break;
+      default:
+        return;
+    }
+
+    if (!wasPressedKey) return;
+
+    wasPressedKey.element.classList.remove('pressed');
+
+    if (wasPressedKey.keyCode.includes('Shift')) {
+      this.toggleShiftLayout();
+    }
+  }
+
+  handleInput(e) {
+    let pressedKey;
+
+    switch (e.type) {
+      case 'mousedown':
+        pressedKey = e.target.closest('.key')?.obj;
+        break;
+      case 'keydown':
+        e.preventDefault();
+        pressedKey = this.keysMap[e.code]?.keyObj;
+        pressedKey?.element.classList.add('pressed');
+        break;
+      default:
+        return;
+    }
+
     if (!pressedKey) return;
-
-    pressedKey.element.classList.add('pressed');
 
     if (
       (pressedKey.keyCode.includes('Alt') && e.ctrlKey)
       || (pressedKey.keyCode.includes('Control') && e.altKey)
     ) {
       this.#changeLanguageLayout();
+      return;
     }
 
+    // return if ctrl or alt key was pressed along with any other key
     if (e.ctrlKey || e.altKey) return;
 
     if (!pressedKey.isSpecial) {
@@ -147,26 +182,6 @@ export default class Keyboard {
       this.toggleShiftLayout();
     } else if (pressedKey.keyCode === 'CapsLock') {
       this.toggleCapsLock();
-    }
-  }
-
-  handleKeyUp(e) {
-    const pressedKey = this.keysMap[e.code]?.keyObj;
-    if (!pressedKey) return;
-    pressedKey.element.classList.remove('pressed');
-
-    if (pressedKey.keyCode.includes('Shift')) {
-      this.toggleShiftLayout();
-    }
-  }
-
-  handleMouseDown(e) {
-    const pressedKey = e.target.closest('.key');
-
-    if (!pressedKey) return;
-
-    if (!pressedKey.isSpecial) {
-      this.writeToTextArea(pressedKey.obj.activeKey);
     }
   }
 }

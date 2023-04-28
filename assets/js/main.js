@@ -4,8 +4,9 @@ import Keyboard from './Keyboard.js';
 const textAreaEl = document.querySelector('textarea');
 
 const keyboard = new Keyboard(keysLayout);
+keyboard.connectTextArea(textAreaEl);
 document.body.append(keyboard.element);
 
-keyboard.connectTextArea(textAreaEl);
-document.addEventListener('keydown', keyboard.handleKeyDown.bind(keyboard));
+document.addEventListener('keydown', keyboard.handleInput.bind(keyboard));
 document.addEventListener('keyup', keyboard.handleKeyUp.bind(keyboard));
+document.addEventListener('mouseup', keyboard.handleKeyUp.bind(keyboard));
