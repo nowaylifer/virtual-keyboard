@@ -79,7 +79,10 @@ body {
 
 .textarea {
   font-size: 20px;
-  width: 1000px;
+  width: 970px;
   height: 250px;
-  background-color: transparent;
+  max-height: 400px;
+  background-color: #fff;
+  border: 1px solid rgba(0,10,20,.1);
+  resize: vertical;
 }
