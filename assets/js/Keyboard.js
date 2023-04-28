@@ -3,15 +3,18 @@ import Key from './Key.js';
 export default class Keyboard {
   constructor(keysMap) {
     this.numOfKeysInEachRow = [15, 15, 14, 14, 9];
+    this.languages = ['eng', 'ru'];
     this.keysMap = Keyboard.#initKeys(keysMap);
     this.element = this.#createElement();
   }
+
+  #currentLanguage = 'eng';
 
   #isShiftPressed = false;
 
   #isCapsLockPressed = false;
 
-  #symbols = /[-._!"`'#%&,:;<>=@{}~$()*+/\\?[\]^|]/;
+  #symbols = /[-._!"`'#%&,:;<>=@{}~$()*+/\\?[\]^№|]/;
 
   // create Key obj for each property in keysMap
   static #initKeys(keysMap) {
@@ -68,11 +71,11 @@ export default class Keyboard {
         return;
       }
 
-      if (this.#isCapsLockPressed && !this.#symbols.test(key.keyString.eng[1])) {
+      if (this.#isCapsLockPressed && !this.#symbols.test(key.keyString[this.#currentLanguage][1])) {
         return;
       }
 
-      const [primaryKeyString, alternativeKeyString] = key.keyString.eng;
+      const [primaryKeyString, alternativeKeyString] = key.keyString[this.#currentLanguage];
       keyObj.activeKey = this.#isShiftPressed ? alternativeKeyString : primaryKeyString;
       keyObj.element.textContent = keyObj.activeKey;
     });
@@ -87,25 +90,55 @@ export default class Keyboard {
       if (
         keyObj.isSpecial
         || typeof key.keyString === 'string'
-        || this.#symbols.test(key.keyString.eng[1])
+        || this.#symbols.test(key.keyString[this.#currentLanguage][1])
       ) {
         return;
       }
 
-      const [lowerCase, upperCase] = key.keyString.eng;
+      const [lowerCase, upperCase] = key.keyString[this.#currentLanguage];
       keyObj.activeKey = this.#isCapsLockPressed ? upperCase : lowerCase;
       keyObj.element.textContent = keyObj.activeKey;
     });
   }
 
+  #changeLanguageLayout() {
+    const langIndex = this.languages.indexOf(this.#currentLanguage);
+    this.#currentLanguage = this.languages[langIndex + 1] ?? this.languages[0];
+
+    Object.values(this.keysMap).forEach((key) => {
+      const { keyObj } = key;
+
+      if (keyObj.isSpecial || typeof key.keyString === 'string') {
+        return;
+      }
+
+      const [primaryKey, alternativeKey] = key.keyString[this.#currentLanguage];
+
+      if (this.#symbols.test(alternativeKey)) {
+        keyObj.activeKey = this.#isShiftPressed ? alternativeKey : primaryKey;
+      } else {
+        keyObj.activeKey = this.#isCapsLockPressed ? alternativeKey : primaryKey;
+      }
+
+      keyObj.element.textContent = keyObj.activeKey;
+    });
+  }
+
   handleKeyDown(e) {
+    e.preventDefault();
+
     const pressedKey = this.keysMap[e.code]?.keyObj;
     if (!pressedKey) return;
-    if (pressedKey.keyCode === 'Space') {
-      e.preventDefault();
-    }
 
     pressedKey.element.classList.add('pressed');
+
+    if (
+      (pressedKey.keyCode.includes('Alt') && e.ctrlKey)
+      || (pressedKey.keyCode.includes('Control') && e.altKey)
+    ) {
+      this.#changeLanguageLayout();
+    }
+
     if (e.ctrlKey || e.altKey) return;
 
     if (!pressedKey.isSpecial) {
