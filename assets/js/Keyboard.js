@@ -56,13 +56,29 @@ export default class Keyboard {
     this.inputField = element;
   }
 
-  #writeText(string) {
-    this.inputField.setRangeText(
-      string,
-      this.inputField.selectionStart,
-      this.inputField.selectionEnd,
-      'end',
-    );
+  #writeText(
+    string,
+    from = this.inputField.selectionStart,
+    to = this.inputField.selectionEnd,
+  ) {
+    this.inputField.setRangeText(string, from, to, 'end');
+  }
+
+  #deleteText(key) {
+    if (!this.inputField.value) return;
+
+    const { selectionStart, selectionEnd } = this.inputField;
+
+    if (selectionStart !== selectionEnd) {
+      this.#writeText('');
+      return;
+    }
+
+    if (key === 'Backspace') {
+      this.#writeText('', selectionStart - 1, selectionStart);
+    } else {
+      this.#writeText('', selectionStart, selectionStart + 1);
+    }
   }
 
   toggleShiftLayout() {
@@ -177,10 +193,11 @@ export default class Keyboard {
 
     this.inputField.focus();
 
+    const { keyCode } = pressedKey;
+
     // check for Ctrl + Alt
     if (
-      ((pressedKey.keyCode.includes('Alt') && e.ctrlKey)
-      || (pressedKey.keyCode.includes('Control') && e.altKey))
+      ((keyCode.includes('Alt') && e.ctrlKey) || (keyCode.includes('Control') && e.altKey))
       && !e.repeat
     ) {
       this.changeLanguageLayout();
@@ -192,10 +209,12 @@ export default class Keyboard {
 
     if (!pressedKey.isSpecial) {
       this.#writeText(pressedKey.activeKey);
-    } else if (pressedKey.keyCode.includes('Shift') && !e.repeat) {
+    } else if (keyCode.includes('Shift') && !e.repeat) {
       this.toggleShiftLayout();
-    } else if (pressedKey.keyCode === 'CapsLock' && !e.repeat) {
+    } else if (keyCode === 'CapsLock' && !e.repeat) {
       this.toggleCapsLock();
+    } else if (keyCode === 'Backspace' || keyCode === 'Delete') {
+      this.#deleteText(keyCode);
     }
   }
 }
