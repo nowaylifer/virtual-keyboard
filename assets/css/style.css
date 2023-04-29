@@ -473,6 +473,7 @@ body {
 }
 
 .key {
+  position: relative;
   width: 58px;
   height: 58px;
   font-family: Mulish, sans-serif;
@@ -487,6 +488,14 @@ body {
   color: var(--key-color);
   background-color: var(--key-pressed-color);
   transform: matrix(0.95, 0, 0, 0.95, 0, 0);
+}
+.key::after {
+  content: "";
+  position: absolute;
+  left: -1.5px;
+  top: -1.5px;
+  bottom: -1.5px;
+  right: -1.5px;
 }
 
 .key--long {
