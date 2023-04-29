@@ -64,7 +64,7 @@ export default class Keyboard {
     this.inputField.setRangeText(string, from, to, 'end');
   }
 
-  #deleteText(key) {
+  #deleteText(byKey) {
     if (!this.inputField.value) return;
 
     const { selectionStart, selectionEnd } = this.inputField;
@@ -74,10 +74,26 @@ export default class Keyboard {
       return;
     }
 
-    if (key === 'Backspace') {
+    if (byKey === 'Backspace') {
       this.#writeText('', selectionStart - 1, selectionStart);
     } else {
       this.#writeText('', selectionStart, selectionStart + 1);
+    }
+  }
+
+  #moveCursor(direction) {
+    const moveHorizontally = (dir) => {
+      if (this.inputField.selectionStart === this.inputField.selectionEnd) {
+        if (this.inputField.selectionStart === 0 && dir === 'left') return;
+        this.inputField.selectionStart += dir === 'right' ? 1 : -1;
+        this.inputField.selectionEnd = this.inputField.selectionStart;
+      }
+    };
+
+    if (direction === 'right' || direction === 'left') {
+      moveHorizontally(direction);
+    } else {
+      // moveVertically();
     }
   }
 
@@ -92,7 +108,7 @@ export default class Keyboard {
 
       const [primaryKey, alternativeKey] = key.keyString[this.#currentLanguage];
 
-      // skip uppercase letters when capslock is pressed
+      // skip keys which both primaryKey and alternativeKey are letters when capsLock is pressed
       if (
         this.#isCapsLockPressed
         && primaryKey.toUpperCase() === alternativeKey
@@ -116,6 +132,7 @@ export default class Keyboard {
 
       const [primaryKey, alternativeKey] = key.keyString[this.#currentLanguage];
 
+      // skip keys that have symbols as altertiveKey
       if (primaryKey.toUpperCase() !== alternativeKey) {
         return;
       }
@@ -183,7 +200,6 @@ export default class Keyboard {
         pressedKey = e.target.closest('.key')?.obj;
         break;
       case 'keydown':
-        e.preventDefault();
         pressedKey = this.keysMap[e.code]?.keyObj;
         pressedKey?.element.classList.add('pressed');
         break;
@@ -219,6 +235,10 @@ export default class Keyboard {
       this.#writeText('\n');
     } else if (keyCode === 'Tab') {
       this.#writeText('\t');
+    } else if (keyCode.includes('Arrow')) {
+      this.#moveCursor(keyCode.slice(5).toLowerCase());
     }
+
+    if (e.type === 'keydown') e.preventDefault();
   }
 }
