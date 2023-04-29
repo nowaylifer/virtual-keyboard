@@ -172,6 +172,10 @@ export default class Keyboard {
   }
 
   handleInputDown(e) {
+    if (document.activeElement !== this.inputField) {
+      this.inputField.focus();
+    }
+
     let pressedKey;
 
     switch (e.type) {

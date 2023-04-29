@@ -7,8 +7,10 @@ const keyboard = new Keyboard(keysLayout);
 keyboard.connectInputField(textAreaEl);
 document.body.append(keyboard.element);
 
-textAreaEl.addEventListener('blur', () => {
-  textAreaEl.focus();
+textAreaEl.addEventListener('blur', (e) => {
+  if (e.relatedTarget !== null) {
+    textAreaEl.focus();
+  }
 });
 
 document.addEventListener('keydown', keyboard.handleInputDown.bind(keyboard));
