@@ -27,6 +27,7 @@ body {
   padding: 35px;
   background-color: var(--keyboard-frame-color);
   border-radius: 16px;
+  transform: scale(0.9);
 }
 
 .keyboard__keys-container {
@@ -89,11 +90,18 @@ body {
 
 .textarea {
   font-size: 20px;
-  width: 970px;
-  height: 250px;
+  width: 873px;
+  height: 200px;
   line-height: 1.1;
-  max-height: 400px;
+  min-height: 100px;
+  max-height: 350px;
   background-color: #fff;
-  border: 1px solid rgba(0,10,20,.1);
+  border: 1px solid rgba(0, 10, 20, .1);
   resize: vertical;
+}
+
+.text {
+  text-align: center;
+  line-height: 1.4;
+  color: #747474;
 }

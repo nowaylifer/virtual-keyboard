@@ -81,22 +81,6 @@ export default class Keyboard {
     }
   }
 
-  #moveCursor(direction) {
-    const moveHorizontally = (dir) => {
-      if (this.inputField.selectionStart === this.inputField.selectionEnd) {
-        if (this.inputField.selectionStart === 0 && dir === 'left') return;
-        this.inputField.selectionStart += dir === 'right' ? 1 : -1;
-        this.inputField.selectionEnd = this.inputField.selectionStart;
-      }
-    };
-
-    if (direction === 'right' || direction === 'left') {
-      moveHorizontally(direction);
-    } else {
-      // moveVertically();
-    }
-  }
-
   toggleShiftLayout() {
     this.#isShiftPressed = !this.#isShiftPressed;
 
@@ -236,7 +220,11 @@ export default class Keyboard {
     } else if (keyCode === 'Tab') {
       this.#writeText('\t');
     } else if (keyCode.includes('Arrow')) {
-      this.#moveCursor(keyCode.slice(5).toLowerCase());
+      if (e.type === 'mousedown') {
+        this.#writeText(pressedKey.activeKey);
+      } else {
+        return;
+      }
     }
 
     if (e.type === 'keydown') e.preventDefault();

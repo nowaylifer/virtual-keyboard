@@ -168,7 +168,6 @@ input[type='search'] {
 textarea {
   overflow: auto;
   vertical-align: top;
-  resize: vertical;
 }
 
 /**
@@ -442,10 +441,6 @@ fieldset {
   border: 0;
   margin: 0;
   padding: 0;
-}
-
-textarea {
-  resize: vertical;
 }
 
 .chromeframe {
