@@ -1,7 +1,7 @@
 export default class Key {
-  constructor(keyCode, keyData) {
+  constructor(keyCode, keyData, lang) {
     this.keyCode = keyCode;
-    this.activeKey = `${keyData.keyString.eng?.[0] ?? keyData.keyString}`;
+    this.activeKey = `${keyData.keyString[lang]?.[0] ?? keyData.keyString}`;
     this.element = this.createElement(keyData);
   }
 

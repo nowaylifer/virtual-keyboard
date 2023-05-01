@@ -4,22 +4,23 @@ export default class Keyboard {
   constructor(keysMap) {
     this.numOfKeysInEachRow = [15, 15, 14, 14, 9];
     this.languages = ['eng', 'ru'];
-    this.keysMap = Keyboard.#initKeys(keysMap);
+    this.#currentLanguage = localStorage.getItem('lang') ?? this.languages[0];
+    this.keysMap = this.#initKeys(keysMap);
     this.element = this.#createElement();
   }
 
-  #currentLanguage = 'eng';
+  #currentLanguage;
 
   #isShiftPressed = false;
 
   #isCapsLockPressed = false;
 
   // create Key obj for each property in keysMap
-  static #initKeys(keysMap) {
+  #initKeys(keysMap) {
     const keysMapExtended = keysMap;
 
     Object.keys(keysMapExtended).forEach((key) => {
-      keysMapExtended[key].keyObj = new Key(key, keysMap[key]);
+      keysMapExtended[key].keyObj = new Key(key, keysMap[key], this.#currentLanguage);
     });
 
     return keysMapExtended;
@@ -65,11 +66,15 @@ export default class Keyboard {
   }
 
   #deleteText(byKey) {
-    if (this.inputField.selectionStart === 0 && this.inputField.selectionEnd === 0) {
+    const { selectionStart, selectionEnd } = this.inputField;
+
+    if (
+      selectionStart === 0
+      && selectionEnd === 0
+      && byKey === 'Backspace'
+    ) {
       return;
     }
-
-    const { selectionStart, selectionEnd } = this.inputField;
 
     if (selectionStart !== selectionEnd) {
       this.#writeText('');
@@ -131,6 +136,7 @@ export default class Keyboard {
   changeLanguageLayout() {
     const langIndex = this.languages.indexOf(this.#currentLanguage);
     this.#currentLanguage = this.languages[langIndex + 1] ?? this.languages[0];
+    localStorage.setItem('lang', this.#currentLanguage);
 
     Object.values(this.keysMap).forEach((key) => {
       const { keyObj } = key;
