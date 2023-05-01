@@ -65,7 +65,9 @@ export default class Keyboard {
   }
 
   #deleteText(byKey) {
-    if (!this.inputField.value) return;
+    if (this.inputField.selectionStart === 0 && this.inputField.selectionEnd === 0) {
+      return;
+    }
 
     const { selectionStart, selectionEnd } = this.inputField;
 
@@ -165,9 +167,9 @@ export default class Keyboard {
 
     if (!wasPressedKey) return;
 
-    wasPressedKey.element.classList.remove('pressed');
+    wasPressedKey?.element.classList.remove('pressed');
 
-    if (wasPressedKey.keyCode.includes('Shift')) {
+    if (wasPressedKey?.keyCode.includes('Shift')) {
       this.toggleShiftLayout();
     }
   }
@@ -225,6 +227,8 @@ export default class Keyboard {
       } else {
         return;
       }
+    } else if (keyCode === 'PageUp' || keyCode === 'PageDown') {
+      return;
     }
 
     if (e.type === 'keydown') e.preventDefault();
